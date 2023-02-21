@@ -3,7 +3,8 @@
 
 requests!=2.20.0,!=2.24.0                              # Apache License, Version 2.0
 
-rally>=3.1.0                                           # Apache License, Version 2.0
+#workaround for https://bugs.launchpad.net/rally/+bug/2004022
+git+git://github.com/openstack/rally@14d449b#egg=rally          # Apache License, Version 2.0
 
 # OpenStack related
 gnocchiclient                                          # Apache Software License
