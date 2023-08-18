@@ -17,8 +17,18 @@ Changelog
    was missed or can be improved, feel free to change it!
 
 
-[unreleased]
-------------
+[2.3.0] - 2023-08-01
+--------------------
+
+Deprecated
+~~~~~~~~~~
+This is the last release with support of Python 3.6 and Python 3.7
+
+Changed
+~~~~~~~
+
+* Bumped min required version of Rally to 3.4.0.
+* Switch docker image to rally 3.4.0 base.
 
 Removed
 ~~~~~~~

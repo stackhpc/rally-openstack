@@ -37,7 +37,7 @@ CONF = cfg.CONF
 class CreateAndListTrunks(neutron_utils.NeutronScenario):
 
     def run(self, network_create_args=None, subport_count=10):
-        """Create and a given number of trunks with subports and list all trunks
+        """Create a given number of trunks with subports and list all trunks.
 
         :param network_create_args: dict, POST /v2.0/networks request
                                     options. Deprecated.
@@ -54,10 +54,8 @@ class CreateAndListTrunks(neutron_utils.NeutronScenario):
         trunk_payload = {"port_id": parent["port"]["id"],
                          "sub_ports": subport_payload}
         trunk = self._create_trunk(trunk_payload)
-        self._update_port(parent, {"device_id": "sometrunk"})
         self._list_trunks()
         self._list_subports_by_trunk(trunk["trunk"]["id"])
-        self._list_ports_by_device_id("sometrunk")
 
 
 @types.convert(image={"type": "glance_image"},
