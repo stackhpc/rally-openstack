@@ -44,6 +44,10 @@ class TempestContext(context.VerifierContext):
     def __init__(self, ctx):
         super(TempestContext, self).__init__(ctx)
 
+        # If openstack.enable_create_resources==False you can provide
+        # a non-admin credential. You will need to make sure that the
+        # resources are discovered by supplying config options such as
+        # flavor_id.
         openstack_platform = self.verifier.env.data["platforms"]["openstack"]
         admin_creds = credential.OpenStackCredential(
             permission=consts.EndpointPermission.ADMIN,
@@ -144,6 +148,8 @@ class TempestContext(context.VerifierContext):
             self.conf.write(configfile)
 
     def _create_tempest_roles(self):
+        if not conf.CONF.openstack.enable_create_resources:
+            return
         keystoneclient = self.clients.verified_keystone()
         roles = [conf.CONF.openstack.swift_operator_role,
                  conf.CONF.openstack.swift_reseller_admin_role,
@@ -251,6 +257,10 @@ class TempestContext(context.VerifierContext):
                           % (image_obj.name, image_obj.id))
                 return image_obj
 
+        if not conf.CONF.openstack.enable_create_resources:
+            msg = ("Image could not discovered and openstack.enable_create_resources is set to False")
+            raise exceptions.RallyException(msg)
+
         params = {
             "image_name": self.generate_random_name(),
             "disk_format": conf.CONF.openstack.img_disk_format,
@@ -283,6 +293,10 @@ class TempestContext(context.VerifierContext):
 
         LOG.debug("There is no flavor with the mentioned properties.")
 
+        if not conf.CONF.openstack.enable_create_resources:
+            msg = ("Flavor could not discovered and openstack.enable_create_resources is set to False")
+            raise exceptions.RallyException(msg)
+
         params = {
             "name": self.generate_random_name(),
             "ram": flv_ram,
@@ -300,6 +314,10 @@ class TempestContext(context.VerifierContext):
         return flavor
 
     def _create_network_resources(self):
+        if not conf.CONF.openstack.enable_create_resources:
+            msg = ("fixed_network_name not set and openstack.enable_create_resources is set to False")
+            raise exceptions.RallyException(msg)
+
         client = neutron.NeutronService(
             clients=self.clients,
             name_generator=self.generate_random_name,
