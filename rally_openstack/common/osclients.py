@@ -241,11 +241,17 @@ class OSClient(plugin.Plugin):
         return self.cache[key]
 
     @classmethod
-    def get(cls, name, **kwargs):
-        # NOTE(boris-42): Remove this after we finish rename refactoring.
-        kwargs.pop("platform", None)
-        kwargs.pop("namespace", None)
-        return super(OSClient, cls).get(name, platform="openstack", **kwargs)
+    def get(
+        cls,
+        name: str,
+        platform: str = "openstack",  # type: ignore[override]
+        allow_hidden: bool = False
+    ) -> type["OSClient"]:
+        return super(OSClient, cls).get(
+            name,
+            platform=platform,
+            allow_hidden=allow_hidden
+        )
 
 
 @configure("keystone", supported_versions=("2", "3"))
@@ -543,7 +549,8 @@ class Cinder(OSClient):
         return client
 
 
-@configure("manila", default_version="1", default_service_type="share")
+@configure("manila", default_version="2",
+           default_service_type="shared-file-system")
 class Manila(OSClient):
     """Wrapper for ManilaClient which returns an authenticated native client.
 
@@ -610,46 +617,16 @@ class Ironic(OSClient):
         return client
 
 
-@configure("sahara", default_version="1.1", supported_versions=["1.0", "1.1"],
-           default_service_type="data-processing")
-class Sahara(OSClient):
-    """Wrapper for SaharaClient which returns an authenticated native client.
-
-    """
-
-    # NOTE(andreykurilin): saharaclient supports "1.0" version and doesn't
-    # support "1". `choose_version` and `validate_version` methods are written
-    # as a hack to covert 1 -> 1.0, which can simplify setting saharaclient
-    # for end-users.
-    def choose_version(self, version=None):
-        return float(super(Sahara, self).choose_version(version))
-
-    @classmethod
-    def validate_version(cls, version):
-        super(Sahara, cls).validate_version(float(version))
-
-    def create_client(self, version=None, service_type=None):
-        """Return Sahara client."""
-        from saharaclient import client as sahara
-
-        client = sahara.Client(
-            self.choose_version(version),
-            session=self.keystone.get_session()[0],
-            sahara_url=self._get_endpoint(service_type))
-
-        return client
-
-
-@configure("zaqar", default_version="1.1", default_service_type="messaging",
-           supported_versions=["1", "1.1"])
+@configure("zaqar", default_version="2", default_service_type="messaging",
+           supported_versions=["2"])
 class Zaqar(OSClient):
     """Wrapper for ZaqarClient which returns an authenticated native client.
 
     """
 
     def choose_version(self, version=None):
-        # zaqarclient accepts only int or float obj as version
-        return float(super(Zaqar, self).choose_version(version))
+        # zaqarclient accepts only int as version
+        return int(super(Zaqar, self).choose_version(version))
 
     def create_client(self, version=None, service_type=None):
         """Return Zaqar client."""
@@ -657,25 +634,6 @@ class Zaqar(OSClient):
         client = zaqar.Client(url=self._get_endpoint(),
                               version=self.choose_version(version),
                               session=self.keystone.get_session()[0])
-        return client
-
-
-@configure("murano", default_version="1",
-           default_service_type="application-catalog",
-           supported_versions=["1"])
-class Murano(OSClient):
-    """Wrapper for MuranoClient which returns an authenticated native client.
-
-    """
-
-    def create_client(self, version=None, service_type=None):
-        """Return Murano client."""
-        from muranoclient import client as murano
-
-        client = murano.Client(self.choose_version(version),
-                               endpoint=self._get_endpoint(service_type),
-                               token=self.keystone.auth_ref.auth_token)
-
         return client
 
 
@@ -754,46 +712,6 @@ class Swift(OSClient):
                                   tenant_name=self.credential.tenant_name,
                                   )
         return client
-
-
-@configure("monasca", default_version="2_0",
-           default_service_type="monitoring", supported_versions=["2_0"])
-class Monasca(OSClient):
-    """Wrapper for MonascaClient which returns an authenticated native client.
-
-    """
-
-    def create_client(self, version=None, service_type=None):
-        """Return monasca client."""
-        from monascaclient import client as monasca
-
-        # Change this to use session once it's supported by monascaclient
-        client = monasca.Client(
-            self.choose_version(version),
-            self._get_endpoint(service_type),
-            token=self.keystone.auth_ref.auth_token,
-            timeout=CONF.openstack_client_http_timeout,
-            insecure=self.credential.https_insecure,
-            **self._get_auth_info(project_name_key="tenant_name"))
-        return client
-
-
-@configure("senlin", default_version="1", default_service_type="clustering",
-           supported_versions=["1"])
-class Senlin(OSClient):
-    """Wrapper for SenlinClient which returns an authenticated native client.
-
-    """
-
-    def create_client(self, version=None, service_type=None):
-        """Return senlin client."""
-        from senlinclient import client as senlin
-
-        return senlin.Client(
-            self.choose_version(version),
-            **self._get_auth_info(project_name_key="project_name",
-                                  cacert_key="cert",
-                                  endpoint_type="interface"))
 
 
 @configure("magnum", default_version="1", supported_versions=["1"],

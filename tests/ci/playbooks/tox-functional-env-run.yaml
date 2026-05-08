@@ -3,8 +3,16 @@
     - run-devstack
 
 - hosts: controller
+  become: true
+  tasks:
+    - name: "Ensure tox is installed"
+      include_role:
+        name: ensure-tox
   vars:
-    rally_fake_image_path: '{{ rally_home_dir }}/extra/fake-image.img'
+    ensure_global_symlinks: true
+
+- hosts: controller
+  vars:
     rally_task_args_file: "100-percent-not-exist-file"
     # this task will not be launched, but we need to specify something real to
     # pass a check at 'prepare-for-rally-task' role.

@@ -20,15 +20,11 @@ from rally_openstack.common.cfg import ironic
 from rally_openstack.common.cfg import magnum
 from rally_openstack.common.cfg import manila
 from rally_openstack.common.cfg import mistral
-from rally_openstack.common.cfg import monasca
-from rally_openstack.common.cfg import murano
 from rally_openstack.common.cfg import neutron
 from rally_openstack.common.cfg import nova
 from rally_openstack.common.cfg import octavia
 from rally_openstack.common.cfg import osclients
 from rally_openstack.common.cfg import profiler
-from rally_openstack.common.cfg import sahara
-from rally_openstack.common.cfg import senlin
 from rally_openstack.common.cfg import vm
 from rally_openstack.common.cfg import watcher
 
@@ -46,11 +42,11 @@ def list_opts():
 
     opts = {}
     for l_opts in (cinder.OPTS, heat.OPTS, ironic.OPTS, magnum.OPTS,
-                   manila.OPTS, mistral.OPTS, monasca.OPTS, murano.OPTS,
-                   nova.OPTS, osclients.OPTS, profiler.OPTS, sahara.OPTS,
+                   manila.OPTS, mistral.OPTS,
+                   nova.OPTS, osclients.OPTS, profiler.OPTS,
                    vm.OPTS, glance.OPTS, watcher.OPTS, tempest.OPTS,
                    keystone_roles.OPTS, keystone_users.OPTS, cleanup.OPTS,
-                   senlin.OPTS, neutron.OPTS, octavia.OPTS,
+                   neutron.OPTS, octavia.OPTS,
                    osprofilerchart.OPTS):
         for category, opt in l_opts.items():
             opts.setdefault(category, [])

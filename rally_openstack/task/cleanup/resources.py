@@ -60,7 +60,6 @@ class QuotaMixin(SynchronizedDeletion, base.ResourceManager):
 _magnum_order = get_order(80)
 
 
-@base.resource(service=None, resource=None)
 class MagnumMixin(base.ResourceManager):
 
     def id(self):
@@ -97,42 +96,6 @@ class MagnumClusterTemplate(MagnumMixin):
 class HeatStack(base.ResourceManager):
     def name(self):
         return self.raw_resource.stack_name
-
-
-# SENLIN
-
-_senlin_order = get_order(150)
-
-
-@base.resource(service=None, resource=None, admin_required=True)
-class SenlinMixin(base.ResourceManager):
-
-    def id(self):
-        return self.raw_resource["id"]
-
-    def _manager(self):
-        client = self._admin_required and self.admin or self.user
-        return getattr(client, self._service)()
-
-    def list(self):
-        return getattr(self._manager(), self._resource)()
-
-    def delete(self):
-        # make singular form of resource name from plural form
-        res_name = self._resource[:-1]
-        return getattr(self._manager(), "delete_%s" % res_name)(self.id())
-
-
-@base.resource("senlin", "clusters",
-               admin_required=True, order=next(_senlin_order))
-class SenlinCluster(SenlinMixin):
-    """Resource class for Senlin Cluster."""
-
-
-@base.resource("senlin", "profiles", order=next(_senlin_order),
-               admin_required=False, tenant_resource=True)
-class SenlinProfile(SenlinMixin):
-    """Resource class for Senlin Profile."""
 
 
 # NOVA
@@ -207,7 +170,6 @@ class NovaAggregate(SynchronizedDeletion, base.ResourceManager):
 _neutron_order = get_order(300)
 
 
-@base.resource(service=None, resource=None, admin_required=True)
 class NeutronMixin(SynchronizedDeletion, base.ResourceManager):
 
     @property
@@ -639,72 +601,6 @@ class GlanceImage(base.ResourceManager):
             check_interval=CONF.openstack.glance_image_delete_poll_interval)
 
 
-# SAHARA
-
-_sahara_order = get_order(600)
-
-
-@base.resource("sahara", "job_executions", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaJobExecution(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
-@base.resource("sahara", "jobs", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaJob(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
-@base.resource("sahara", "job_binary_internals", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaJobBinaryInternals(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
-@base.resource("sahara", "job_binaries", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaJobBinary(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
-@base.resource("sahara", "data_sources", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaDataSource(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
-@base.resource("sahara", "clusters", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaCluster(base.ResourceManager):
-
-    # Need special treatment for Sahara Cluster because of the way the
-    # exceptions are described in:
-    # https://github.com/openstack/python-saharaclient/blob/master/
-    # saharaclient/api/base.py#L145
-
-    def is_deleted(self):
-        from saharaclient.api import base as saharaclient_base
-
-        try:
-            self._manager().get(self.id())
-            return False
-        except saharaclient_base.APIException as e:
-            return e.error_code == 404
-
-
-@base.resource("sahara", "cluster_templates", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaClusterTemplate(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
-@base.resource("sahara", "node_group_templates", order=next(_sahara_order),
-               tenant_resource=True)
-class SaharaNodeGroup(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
 # CEILOMETER
 
 @base.resource("ceilometer", "alarms", order=700, tenant_resource=True)
@@ -871,25 +767,6 @@ class MistralExecutions(SynchronizedDeletion, base.ResourceManager):
         #   we can use for filtering, but it stores workflow id and name, even
         #   after workflow deletion.
         return self.raw_resource.workflow_name
-
-# MURANO
-
-
-_murano_order = get_order(1200)
-
-
-@base.resource("murano", "environments", tenant_resource=True,
-               order=next(_murano_order))
-class MuranoEnvironments(SynchronizedDeletion, base.ResourceManager):
-    pass
-
-
-@base.resource("murano", "packages", tenant_resource=True,
-               order=next(_murano_order))
-class MuranoPackages(base.ResourceManager):
-    def list(self):
-        return filter(lambda x: x.name != "Core library",
-                      super(MuranoPackages, self).list())
 
 
 # IRONIC

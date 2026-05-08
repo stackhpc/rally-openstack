@@ -67,15 +67,6 @@ class TempestConfigfileManager(object):
         self.conf.set(section_name, "admin_domain_name",
                       self.credential.user_domain_name or "Default")
 
-    # Sahara has two service types: 'data_processing' and 'data-processing'.
-    # 'data_processing' is deprecated, but it can be used in previous OpenStack
-    # releases. So we need to configure the 'catalog_type' option to support
-    # environments where 'data_processing' is used as service type for Sahara.
-    def _configure_data_processing(self, section_name="data-processing"):
-        if "sahara" in self.available_services:
-            self.conf.set(section_name, "catalog_type",
-                          self._get_service_type_by_service_name("sahara"))
-
     def _configure_identity(self, section_name="identity"):
         self.conf.set(section_name, "region",
                       self.credential.region_name)
@@ -161,8 +152,19 @@ class TempestConfigfileManager(object):
                 if net["status"] == "ACTIVE" and net["router:external"] is True
             ]
             if public_nets:
+                rbac_list = neutronclient.list_rbac_policies()["rbac_policies"]
+                rbac_all_list = []
+                for rbac in rbac_list:
+                    if rbac["target_tenant"] == "*" and \
+                       rbac["object_type"] == "network":
+                        rbac_all_list.append(rbac["object_id"])
                 net_id = public_nets[0]["id"]
                 net_name = public_nets[0]["name"]
+                for public_net in public_nets:
+                    if public_net["id"] in rbac_all_list:
+                        net_id = public_net["id"]
+                        net_name = public_net["name"]
+                        break
                 self.conf.set(section_name, "public_network_id", net_id)
                 self.conf.set(section_name, "floating_network_name", net_name)
         else:
@@ -190,7 +192,7 @@ class TempestConfigfileManager(object):
 
     def _configure_service_available(self, section_name="service_available"):
         services = ["cinder", "glance", "heat", "ironic", "neutron", "nova",
-                    "sahara", "swift"]
+                    "swift"]
         for service in services:
             # Convert boolean to string because ConfigParser fails
             # on attempt to get option with boolean value

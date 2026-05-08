@@ -279,17 +279,6 @@ class Cinder(ResourceManager):
         return self.client.qos_specs.list()
 
 
-class Senlin(ResourceManager):
-
-    REQUIRED_SERVICE = consts.Service.SENLIN
-
-    def list_clusters(self):
-        return self.client.clusters()
-
-    def list_profiles(self):
-        return self.client.profiles()
-
-
 class Manila(ResourceManager):
 
     REQUIRED_SERVICE = consts.Service.MANILA
@@ -351,25 +340,6 @@ class Ironic(ResourceManager):
         return self.client.node.list()
 
 
-class Sahara(ResourceManager):
-
-    REQUIRED_SERVICE = consts.Service.SAHARA
-
-    def list_node_group_templates(self):
-        return self.client.node_group_templates.list()
-
-
-class Murano(ResourceManager):
-
-    REQUIRED_SERVICE = consts.Service.MURANO
-
-    def list_environments(self):
-        return self.client.environments.list()
-
-    def list_packages(self):
-        return self.client.packages.list(include_disabled=True)
-
-
 class Designate(ResourceManager):
 
     REQUIRED_SERVICE = consts.Service.DESIGNATE
@@ -409,14 +379,6 @@ class Trove(ResourceManager):
 
     def list_modules(self):
         return self.client.module.list(datastore="all")
-
-
-class Monasca(ResourceManager):
-
-    REQUIRED_SERVICE = consts.Service.MONASCA
-
-    def list_metrics(self):
-        return self.client.metrics.list()
 
 
 class Watcher(ResourceManager):
@@ -562,8 +524,6 @@ def check_resource(resources_mgs, compare_with, json_output):
                 or (resource["cls"] == "cinder"
                     and resource["resource_name"] == "volume"
                     and resource["id"].get("name") in volume_names)
-
-                or resource["cls"] == "murano"
 
                 # Glance has issues with uWSGI integration...
                 # or resource["cls"] == "glance"

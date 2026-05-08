@@ -47,6 +47,8 @@ class Quotas(context.OpenStackContext):
         }
     }
 
+    config: dict[str, dict[str, int]]
+
     def __init__(self, ctx):
         super(Quotas, self).__init__(ctx)
         self.clients = osclients.Clients(
@@ -71,7 +73,7 @@ class Quotas(context.OpenStackContext):
                     # NOTE(andreykurilin): in case of existing users it is
                     #   required to restore original quotas instead of reset
                     #   to default ones.
-                    if "existing_users" in self.context:
+                    if "existing_users" in self.context["config"]:
                         self.original_quotas.append(
                             (service, tenant_id,
                              self.manager[service].get(tenant_id)))

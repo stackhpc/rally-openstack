@@ -55,14 +55,10 @@ class _Service(utils.ImmutableMixin, utils.EnumMixin):
     NEUTRON = "neutron"
     DESIGNATE = "designate"
     CEILOMETER = "ceilometer"
-    MONASCA = "monasca"
     S3 = "s3"
-    SENLIN = "senlin"
     TROVE = "trove"
-    SAHARA = "sahara"
     SWIFT = "swift"
     MISTRAL = "mistral"
-    MURANO = "murano"
     IRONIC = "ironic"
     GNOCCHI = "gnocchi"
     MAGNUM = "magnum"
@@ -79,24 +75,20 @@ class _ServiceType(utils.ImmutableMixin, utils.EnumMixin):
     VOLUMEV2 = "volumev2"
     VOLUMEV3 = "volumev3"
     SHARE = "share"
+    SHARED_FILE_SYSTEM = "shared-file-system"
     EC2 = "ec2"
     IMAGE = "image"
     CLOUD = "cloudformation"
     ORCHESTRATION = "orchestration"
     IDENTITY = "identity"
-    CLUSTERING = "clustering"
     COMPUTE = "compute"
     NETWORK = "network"
     DNS = "dns"
     METERING = "metering"
-    MONITORING = "monitoring"
     S3 = "s3"
     DATABASE = "database"
-    DATA_PROCESSING = "data-processing"
-    DATA_PROCESSING_MOS = "data_processing"
     OBJECT_STORE = "object-store"
     WORKFLOW_EXECUTION = "workflowv2"
-    APPLICATION_CATALOG = "application-catalog"
     BARE_METAL = "baremetal"
     METRIC = "metric"
     CONTAINER_INFRA = "container-infra"
@@ -106,7 +98,6 @@ class _ServiceType(utils.ImmutableMixin, utils.EnumMixin):
 
     def __init__(self):
         self.__names = {
-            self.CLUSTERING: _Service.SENLIN,
             self.COMPUTE: _Service.NOVA,
             # unversioned endpoint of Cinder
             self.BLOCK_STORAGE: _Service.CINDER,
@@ -115,6 +106,7 @@ class _ServiceType(utils.ImmutableMixin, utils.EnumMixin):
             self.VOLUMEV2: _Service.CINDER,
             self.VOLUMEV3: _Service.CINDER,
             self.SHARE: _Service.MANILA,
+            self.SHARED_FILE_SYSTEM: _Service.MANILA,
             self.EC2: _Service.EC2,
             self.IMAGE: _Service.GLANCE,
             self.CLOUD: _Service.CLOUD,
@@ -123,14 +115,10 @@ class _ServiceType(utils.ImmutableMixin, utils.EnumMixin):
             self.NETWORK: _Service.NEUTRON,
             self.DNS: _Service.DESIGNATE,
             self.METERING: _Service.CEILOMETER,
-            self.MONITORING: _Service.MONASCA,
             self.S3: _Service.S3,
             self.DATABASE: _Service.TROVE,
-            self.DATA_PROCESSING: _Service.SAHARA,
-            self.DATA_PROCESSING_MOS: _Service.SAHARA,
             self.OBJECT_STORE: _Service.SWIFT,
             self.WORKFLOW_EXECUTION: _Service.MISTRAL,
-            self.APPLICATION_CATALOG: _Service.MURANO,
             self.BARE_METAL: _Service.IRONIC,
             self.METRIC: _Service.GNOCCHI,
             self.CONTAINER_INFRA: _Service.MAGNUM,

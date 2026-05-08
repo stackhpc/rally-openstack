@@ -145,10 +145,6 @@ class FakeGoal(FakeResource):
     pass
 
 
-class FakeMurano(FakeResource):
-    pass
-
-
 class FakeFloatingIP(FakeResource):
     pass
 
@@ -483,14 +479,6 @@ class FakeGoalManager(FakeManager):
         for key in self.resources_order:
             if self.cache[key].name == resource_name:
                 return self.cache[key]
-
-
-class FakePackageManager(FakeManager):
-
-    def create(self, package_descr, package_arch, package_class=FakeMurano):
-        package = self._cache(package_class(self))
-        package.name = list(package_arch.keys())[0]
-        return package
 
 
 class FakeFloatingIPsManager(FakeManager):
@@ -977,12 +965,6 @@ class FakeGlanceClient(object):
         self.version = version
 
 
-class FakeMuranoClient(object):
-
-    def __init__(self):
-        self.packages = FakePackageManager()
-
-
 class FakeCinderClient(object):
 
     def __init__(self):
@@ -1066,12 +1048,6 @@ class FakeKeystoneClient(object):
 class FakeGnocchiClient(object):
     def __init__(self):
         self.metric = FakeMetricManager()
-
-
-class FakeMonascaClient(object):
-
-    def __init__(self):
-        self.metrics = FakeMetricsManager()
 
 
 class FakeNeutronClient(object):
@@ -1426,38 +1402,6 @@ class FakeIronicClient(object):
         pass
 
 
-class FakeSaharaClient(object):
-
-    def __init__(self):
-        self.job_executions = mock.MagicMock()
-        self.jobs = mock.MagicMock()
-        self.job_binary_internals = mock.MagicMock()
-        self.job_binaries = mock.MagicMock()
-        self.data_sources = mock.MagicMock()
-
-        self.clusters = mock.MagicMock()
-        self.cluster_templates = mock.MagicMock()
-        self.node_group_templates = mock.MagicMock()
-
-        self.setup_list_methods()
-
-    def setup_list_methods(self):
-        mock_with_id = mock.MagicMock()
-        mock_with_id.id = 42
-
-        # First call of list returns a list with one object, the next should
-        # empty after delete.
-        self.job_executions.list.side_effect = [[mock_with_id], []]
-        self.jobs.list.side_effect = [[mock_with_id], []]
-        self.job_binary_internals.list.side_effect = [[mock_with_id], []]
-        self.job_binaries.list.side_effect = [[mock_with_id], []]
-        self.data_sources.list.side_effect = [[mock_with_id], []]
-
-        self.clusters.list.side_effect = [[mock_with_id], []]
-        self.cluster_templates.list.side_effect = [[mock_with_id], []]
-        self.node_group_templates.list.side_effect = [[mock_with_id], []]
-
-
 class FakeZaqarClient(object):
 
     def __init__(self):
@@ -1491,13 +1435,6 @@ class FakeEC2Client(object):
         pass
 
 
-class FakeSenlinClient(object):
-
-    def __init__(self):
-        # TODO(Yanyan Hu):Fake interfaces of senlinclient.
-        pass
-
-
 class FakeMagnumClient(object):
 
     def __init__(self):
@@ -1526,17 +1463,13 @@ class FakeClients(object):
         self._cinder = None
         self._neutron = None
         self._octavia = None
-        self._sahara = None
         self._heat = None
         self._designate = None
         self._zaqar = None
         self._trove = None
         self._mistral = None
         self._swift = None
-        self._murano = None
-        self._monasca = None
         self._ec2 = None
-        self._senlin = None
         self._watcher = None
         self._barbican = None
         self._credential = credential_ or FakeCredential(
@@ -1578,11 +1511,6 @@ class FakeClients(object):
             self._octavia = FakeOctaviaClient()
         return self._octavia
 
-    def sahara(self):
-        if not self._sahara:
-            self._sahara = FakeSaharaClient()
-        return self._sahara
-
     def heat(self):
         if not self._heat:
             self._heat = FakeHeatClient()
@@ -1592,11 +1520,6 @@ class FakeClients(object):
         if not self._designate:
             self._designate = FakeDesignateClient()
         return self._designate
-
-    def monasca(self):
-        if not self._monasca:
-            self._monasca = FakeMonascaClient()
-        return self._monasca
 
     def zaqar(self):
         if not self._zaqar:
@@ -1618,20 +1541,10 @@ class FakeClients(object):
             self._swift = FakeSwiftClient()
         return self._swift
 
-    def murano(self):
-        if not self._murano:
-            self._murano = FakeMuranoClient()
-        return self._murano
-
     def ec2(self):
         if not self._ec2:
             self._ec2 = FakeEC2Client()
         return self._ec2
-
-    def senlin(self):
-        if not self._senlin:
-            self._senlin = FakeSenlinClient()
-        return self._senlin
 
     def watcher(self):
         if not self._watcher:

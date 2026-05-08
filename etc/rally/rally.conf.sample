@@ -483,18 +483,6 @@
 # mistral execution timeout (integer value)
 #mistral_execution_timeout = 200
 
-# Delay between creating Monasca metrics and polling for its elements.
-# (floating point value)
-#monasca_metric_create_prepoll_delay = 15.0
-
-# A timeout in seconds for an environment deploy (integer value)
-# Deprecated group/name - [benchmark]/deploy_environment_timeout
-#murano_deploy_environment_timeout = 1200
-
-# Deploy environment check interval in seconds (integer value)
-# Deprecated group/name - [benchmark]/deploy_environment_check_interval
-#murano_deploy_environment_check_interval = 5
-
 # Time to sleep after start before polling for status (floating point
 # value)
 #nova_server_start_prepoll_delay = 0.0
@@ -714,24 +702,6 @@
 # Enable or disable osprofiler to trace the scenarios (boolean value)
 #enable_profiler = true
 
-# A timeout in seconds for a cluster create operation (integer value)
-#sahara_cluster_create_timeout = 1800
-
-# A timeout in seconds for a cluster delete operation (integer value)
-#sahara_cluster_delete_timeout = 900
-
-# Cluster status polling interval in seconds (integer value)
-#sahara_cluster_check_interval = 5
-
-# A timeout in seconds for a Job Execution to complete (integer value)
-#sahara_job_execution_timeout = 600
-
-# Job Execution status polling interval in seconds (integer value)
-#sahara_job_check_interval = 5
-
-# Amount of workers one proxy should serve to. (integer value)
-#sahara_workers_per_proxy = 20
-
 # Interval between checks when waiting for a VM to become pingable
 # (floating point value)
 #vm_ping_poll_interval = 1.0
@@ -843,10 +813,6 @@
 
 # Number of cleanup threads to run (integer value)
 #cleanup_threads = 20
-
-# Time in seconds to wait for senlin action to finish. (floating point
-# value)
-#senlin_action_timeout = 3600
 
 # Neutron create loadbalancer timeout (floating point value)
 #neutron_create_loadbalancer_timeout = 500.0
